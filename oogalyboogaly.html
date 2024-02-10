@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raft Survival Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: powderblue;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #game-container {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #game-over {
+            display: none;
+            color: red;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>Raft Survival Game</h1>
+    
+    <p>Days Survived: <span id="days">0</span></p>
+    <p>Food: <span id="food">10</span></p>
+    <p>Materials: <span id="materials">5</span></p>
+    <p>Water: <span id="water">8</span></p>
+    <p>Life: <span id="life">10</span></p>
+
+    <button onclick="gatherFood()">Gather Food</button>
+    <button onclick="gatherMaterials()">Gather Materials</button>
+    <button onclick="collectWater()">Collect Water</button>
+    <button onclick="consumeResources()">Consume Resources</button>
+
+    <div id="game-over">
+        <h2>Game Over!</h2>
+        <p>You couldn't survive. Better luck next time!</p>
+        <button onclick="resetGame()">Play Again</button>
+    </div>
+</div>
+
+<script>
+    let daysSurvived = 0;
+    let food = 10;
+    let materials = 5;
+    let water = 8;
+    let life = 10;
+    let gameIsOver = false;
+
+    function updateStats() {
+        document.getElementById('days').innerText = daysSurvived;
+        document.getElementById('food').innerText = food;
+        document.getElementById('materials').innerText = materials;
+        document.getElementById('water').innerText = water;
+        document.getElementById('life').innerText = life;
+    }
+
+    function gatherFood() {
+        if (!gameIsOver && materials > 0) {
+            materials--;
+            food += Math.floor(Math.random() * 3) + 1;
+            daysSurvived++;
+            updateStats();
+            checkGameOver();
+        } else if (!gameIsOver) {
+            alert("You don't have enough materials to gather food!");
+        }
+    }
+
+    function gatherMaterials() {
+        if (!gameIsOver && life > 0) {
+            life--;
+            materials += Math.floor(Math.random() * 2) + 1;
+            daysSurvived++;
+            updateStats();
+            checkGameOver();
+        } else if (!gameIsOver) {
+            alert("You don't have enough life to gather materials!");
+        }
+    }
+
+    function collectWater() {
+        if (!gameIsOver) {
+            water += Math.floor(Math.random() * 4) + 1;
+            daysSurvived++;
+            updateStats();
+            checkGameOver();
+        }
+    }
+
+    function consumeResources() {
+        if (!gameIsOver && food > 0 && water > 0) {
+            food--;
+            water--;
+            life += 2; // Replenish life by 2 for each consumption
+            daysSurvived++;
+            updateStats();
+            checkGameOver();
+        } else if (!gameIsOver) {
+            showGameOver();
+        }
+
+        // Lose (1 life + 1 water) each day
+        if (!gameIsOver) {
+            life--;
+            water--;
+            daysSurvived++;
+            updateStats();
+            checkGameOver();
+        }
+
+        // Lose 7 random materials every 3 days
+        if (!gameIsOver && daysSurvived % 3 === 0) {
+            for (let i = 0; i < 7; i++) {
+                materials = Math.max(0, materials - Math.floor(Math.random() * 2) + 1);
+            }
+            updateStats();
+            checkGameOver();
+        }
+    }
+
+    function showGameOver() {
+        document.getElementById('game-over').style.display = 'block';
+        gameIsOver = true;
+    }
+
+    function checkGameOver() {
+        if (food < 1 || materials < 1 || water < 1 || life < 1) {
+            showGameOver();
+        }
+    }
+
+    function resetGame() {
+        daysSurvived = 0;
+        food = 10;
+        materials = 5;
+        water = 8;
+        life = 10;
+        updateStats();
+        gameIsOver = false;
+
+        document.getElementById('game-over').style.display = 'none';
+    }
+
+    // Start the game by updating the initial stats
+    updateStats();
+</script>
+
+</body>
+</html>
